@@ -126,17 +126,50 @@ return (
     </div>
 
     {/* Team Members */}
-    <div className="bg-white rounded-lg shadow-sm p-6">
-      <h2 className="text-2xl font-bold mb-4">Team Members</h2>
-      <div className="flex gap-4">
-        <Input
-          placeholder="Add team member name"
-          value={newTeamMember}
-          onChange={(e) => setNewTeamMember(e.target.value)}
-          className="flex-1"
-        />
-        <Button className="bg-[#14162C] text-white hover:bg-[#14162C]/90">Add</Button>
-      </div>
+<div className="bg-white rounded-lg shadow-sm p-6">
+  <h2 className="text-2xl font-bold mb-4">Team Members</h2>
+  <div className="flex gap-4 mb-6">
+    <Input
+      placeholder="Add team member name"
+      value={newTeamMember}
+      onChange={(e) => setNewTeamMember(e.target.value)}
+      className="flex-1"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          handleAddTeamMember();
+        }
+      }}
+    />
+    <Button 
+      className="bg-[#14162C] text-white hover:bg-[#14162C]/90"
+      onClick={handleAddTeamMember}
+    >
+      Add
+    </Button>
+  </div>
+
+  {/* List of team members */}
+  {teamMembers.length > 0 && (
+    <div className="space-y-2">
+      {teamMembers.map((member, index) => (
+        <div 
+          key={index} 
+          className="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+        >
+          <span>{member}</span>
+          <Button
+            variant="ghost"
+            className="text-gray-600 hover:text-red-600 p-2 h-auto"
+            onClick={() => {
+              setTeamMembers(teamMembers.filter((_, i) => i !== index));
+            }}
+          >
+            Delete
+          </Button>
+        </div>
+      ))}
     </div>
-  </main>
+  )}
+</div>
+</main>
 )
