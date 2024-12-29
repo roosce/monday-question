@@ -110,33 +110,39 @@ return (
       <h2 className="text-2xl font-bold mb-4">Answer Order</h2>
       {activeQuestion ? (
         <>
-          <p className="mb-4 text-gray-700">{activeQuestion}</p>
           <Button 
             className="bg-[#14162C] text-white hover:bg-[#14162C]/90 mb-4"
             onClick={handleGenerateOrder}
           >
             Generate Order
           </Button>
-      
-          {/* Display the random order */}
+    
+	  <div className="space-y-4">
+            {/* Question with header */}
+	    <div className="p-3 bg-gray-50 rounded-md space-y-2">
+              <p className="font-bold">- - - Monday's Question - - -</p>
+              <p className="font-bold italic">{activeQuestion}</p>
+            </div>
+
+          {/* Team Members List */}
           {randomOrder.length > 0 && (
-            <div className="space-y-2">
+ 	    <div className="space-y-2">
               {randomOrder.map((member, index) => (
                 <div 
                   key={index}
-                  className="flex items-center space-x-3 p-3 bg-gray-50 rounded-md"
+                  className="p-3 bg-gray-50 rounded-md"
                 >
-                  <span className="font-medium text-gray-500">{index + 1}.</span>
-                  <span>{member}</span>
+		  {member}
                 </div>
               ))}
             </div>
           )}
-        </>
-      ) : (
-        <p className="text-gray-500 italic mb-4">Select a question above to generate answer order</p>
-      )}
-    </div>
+        </div>
+      </>
+    ) : (
+      <p className="text-gray-500 italic mb-4">Select a question above to generate answer order</p>
+    )}
+  </div>
 
     {/* Question History */}
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
