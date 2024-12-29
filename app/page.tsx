@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
@@ -8,8 +8,9 @@ import { Input } from "@/components/ui/input"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 
 export default function Page() {
+  const [activeQuestion, setActiveQuestion] = useState<string>("")
   const [selectedQuestion, setSelectedQuestion] = useState<string>("")
-  const [teamMembers, setTeamMembers] = useState<string[]>([])
+  const [teamMembers, setTeamMembers] = useState<string[]>([]) // Initialize with empty array
   const [newTeamMember, setNewTeamMember] = useState("")
   const [previousQuestion, setPreviousQuestion] = useState("")
   const [rating, setRating] = useState("5")
@@ -19,18 +20,35 @@ export default function Page() {
     rating: string;
   }>>([])
 
-  const questions = [
-    "What's the most ridiculous thing you believed as a child?",
-    "If you could have dinner with any historical figure, who would it be and why?",
-    "What's the strangest talent you have?"
-  ]
+useEffect(() => {
+    const saved = localStorage.getItem('teamMembers')
+    if (saved) {
+      setTeamMembers(JSON.parse(saved))
+    }
+  }, [])
 
-  const handleAddTeamMember = () => {
+useEffect(() => {
+    localStorage.setItem('teamMembers', JSON.stringify(teamMembers))
+  }, [teamMembers])
+
+const handleAddTeamMember = () => {
     if (newTeamMember.trim()) {
       setTeamMembers([...teamMembers, newTeamMember.trim()])
       setNewTeamMember("")
     }
   }
+
+const handleUseSelectedQuestion = () => {
+    if (selectedQuestion) {
+      setActiveQuestion(selectedQuestion)
+    }
+  }
+
+  const questions = [
+    "What's the most ridiculous thing you believed as a child?",
+    "If you could have dinner with any historical figure, who would it be and why?",
+    "What's the strangest talent you have?"
+  ]
 
   const handleAddToHistory = () => {
     if (previousQuestion.trim()) {
@@ -47,7 +65,7 @@ export default function Page() {
   }
 
 return (
-  <main className="max-w-4xl mx-auto p-8">
+  <div className="max-w-4xl mx-auto p-8">
     <h1 className="text-4xl font-bold mb-8">Monday Questions</h1>
 
     {/* Question Options */}
@@ -57,20 +75,42 @@ return (
         {questions.map((question, index) => (
           <div key={index} className="flex items-center space-x-3">
             <RadioGroupItem value={question} id={`question-${index}`} />
-            <Label className="text-base font-normal" htmlFor={`question-${index}`}>{question}</Label>
+            <Label
+              className="text-base font-normal"
+              htmlFor={`question-${index}`}
+            >
+              {question}
+            </Label>
           </div>
         ))}
       </RadioGroup>
       <div className="flex justify-between mt-6">
-        <Button className="bg-[#14162C] text-white hover:bg-[#14162C]/90">Generate New Questions</Button>
-        <Button variant="outline" className="border-[#14162C] text-[#14162C]">Use Selected Question</Button>
+        <Button className="bg-[#14162C] text-white hover:bg-[#14162C]/90">
+          Generate New Questions
+        </Button>
+        <Button
+          variant="outline"
+          className="border-[#14162C] text-[#14162C]"
+          onClick={handleUseSelectedQuestion}
+        >
+          Use Selected Question
+        </Button>
       </div>
     </div>
 
     {/* Answer Order */}
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
       <h2 className="text-2xl font-bold mb-4">Answer Order</h2>
-      <Button className="bg-[#14162C] text-white hover:bg-[#14162C]/90">Generate Order</Button>
+      {activeQuestion ? (
+        <>
+          <p className="mb-4 text-gray-700">{activeQuestion}</p>
+          <Button className="bg-[#14162C] text-white hover:bg-[#14162C]/90">
+            Generate Order
+          </Button>
+        </>
+      ) : (
+        <p className="text-gray-500 italic mb-4">Select a question above to generate answer order</p>
+      )}
     </div>
 
     {/* Question History */}
@@ -171,5 +211,6 @@ return (
     </div>
   )}
 </div>
-</main>
+</div>
 )
+}
