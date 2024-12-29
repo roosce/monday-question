@@ -14,6 +14,7 @@ export default function Page() {
   const [newTeamMember, setNewTeamMember] = useState("")
   const [previousQuestion, setPreviousQuestion] = useState("")
   const [rating, setRating] = useState("5")
+  const [randomOrder, setRandomOrder] = useState<string[]>([])
   const [questionHistory, setQuestionHistory] = useState<Array<{
     date: string;
     question: string;
@@ -64,6 +65,12 @@ const handleUseSelectedQuestion = () => {
     }
   }
 
+const handleGenerateOrder = () => {
+  const shuffled = [...teamMembers]
+    .sort(() => Math.random() - 0.5)
+  setRandomOrder(shuffled)
+}
+
 return (
   <div className="max-w-4xl mx-auto p-8">
     <h1 className="text-4xl font-bold mb-8">Monday Questions</h1>
@@ -104,9 +111,27 @@ return (
       {activeQuestion ? (
         <>
           <p className="mb-4 text-gray-700">{activeQuestion}</p>
-          <Button className="bg-[#14162C] text-white hover:bg-[#14162C]/90">
+          <Button 
+            className="bg-[#14162C] text-white hover:bg-[#14162C]/90 mb-4"
+            onClick={handleGenerateOrder}
+          >
             Generate Order
           </Button>
+      
+          {/* Display the random order */}
+          {randomOrder.length > 0 && (
+            <div className="space-y-2">
+              {randomOrder.map((member, index) => (
+                <div 
+                  key={index}
+                  className="flex items-center space-x-3 p-3 bg-gray-50 rounded-md"
+                >
+                  <span className="font-medium text-gray-500">{index + 1}.</span>
+                  <span>{member}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </>
       ) : (
         <p className="text-gray-500 italic mb-4">Select a question above to generate answer order</p>
