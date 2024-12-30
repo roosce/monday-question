@@ -23,6 +23,17 @@ export default function Page() {
   }>>([])
 
   useEffect(() => {
+    const savedHistory = localStorage.getItem('questionHistory')
+    if (savedHistory) {
+      setQuestionHistory(JSON.parse(savedHistory))
+    }
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem('questionHistory', JSON.stringify(questionHistory))
+  }, [questionHistory])
+
+  useEffect(() => {
     const saved = localStorage.getItem('teamMembers')
     if (saved) {
       setTeamMembers(JSON.parse(saved))
@@ -193,7 +204,7 @@ export default function Page() {
             value={rating}
             onChange={(e) => setRating(e.target.value)}
             min="1"
-            max="5"
+            max="10"
             className="w-20"
           />
           <Button 
