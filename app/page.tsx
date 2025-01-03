@@ -6,6 +6,12 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
+import OpenAI from 'openai'
+
+type HistoryItem = {
+  question: string;
+  rating: string;
+}
 
 export default function Page() {
   const [showCopied, setShowCopied] = useState(false)
@@ -118,6 +124,48 @@ export default function Page() {
       })
   }
 
+  const generateNewQuestions = async () => {
+    try {
+      const topQuestions = questionHistory
+        .sort((a, b) => Number(b.rating) - Number(a.rating))
+        .slice(0, 3)
+        .map(item => item.question)
+
+      const openai = new OpenAI({
+        apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+      })
+
+      const prompt = `Generate 3 fun, engaging ice-breaker questions for a team meeting.
+      The questions should be similar in style to these highly-rated examples:
+      ${topQuestions.join('\n')}
+      
+      The questions should:
+      - Be open-ended
+      - Encourage storytelling and discussion
+      - Be light-hearted and fun
+      - Generate laughter and engagement
+      - Be appropriate for a work environment
+      
+      Return only the 3 questions, one per line.`
+
+      const completion = await openai.chat.completions.create({
+        messages: [{ role: "user", content: prompt }],
+        model: "gpt-3.5-turbo",
+      })
+
+      const newQuestions = completion.choices[0].message.content?.split('\n') || []
+      setQuestions(newQuestions)
+
+    } catch (error) {
+      console.error('Error generating questions:', error)
+      setQuestions([
+        "If you could instantly master any skill, what would it be and why?",
+        "What's the most interesting thing you've learned in the last week?",
+        "If you could trade places with anyone for a day, who would it be?"
+      ])
+    }
+  }
+
   console.log('Component rendering, questionHistory:', questionHistory);
 
   return (
@@ -138,7 +186,10 @@ export default function Page() {
           ))}
         </RadioGroup>
         <div className="flex justify-between mt-6">
-          <Button className="bg-[#14162C] text-white hover:bg-[#14162C]/90">
+          <Button
+            className="bg-[#14162C] text-white hover:bg-[#14162C]/90"
+            onClick={generateNewQuestions}
+          >
             Generate New Questions
           </Button>
           <Button
